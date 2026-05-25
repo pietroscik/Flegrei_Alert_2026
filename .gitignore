@@ -1,0 +1,21 @@
+# Dati
+data/raw/*
+data/processed/*
+!data/raw/.gitkeep
+!data/processed/.gitkeep
+*.csv
+*.zip
+
+# R
+.Rproj.user
+.Rhistory
+.RData
+
+# Python
+__pycache__/
+*.pyc
+venv/
+
+# Output
+reports/Flegrei_Alert_2026.pdf
+reports/fig/*
