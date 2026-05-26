@@ -53,7 +53,7 @@ def compute_seismic_rate_rolling(
     Parameters
     ----------
     df : pd.DataFrame
-        Catalog DataFrame
+        Catalog DataFrame with 'time' and 'magnitude' (or 'mag') columns
     window_days : int
         Rolling window length in days
     step_days : int
@@ -66,6 +66,11 @@ def compute_seismic_rate_rolling(
     """
     df = df.copy()
     df["time"] = pd.to_datetime(df["time"])
+    
+    # Normalize column name: 'mag' -> 'magnitude'
+    if 'mag' in df.columns and 'magnitude' not in df.columns:
+        df = df.rename(columns={'mag': 'magnitude'})
+    
     df = df.sort_values("time").reset_index(drop=True)
 
     rates = []
@@ -88,7 +93,10 @@ def compute_seismic_rate_rolling(
             rate = n_events / window_days  # events per day
             
             # Benioff strain release (simplified: sum of 10^(1.5*M))
-            energy = np.sum(10 ** (1.5 * window_df["magnitude"].values))
+            if "magnitude" in window_df.columns:
+                energy = np.sum(10 ** (1.5 * window_df["magnitude"].values))
+            else:
+                energy = np.nan
             
             rates.append(rate)
             times.append(current_start + pd.Timedelta(days=window_days//2))
@@ -133,14 +141,18 @@ def align_bvalue(
     b_df = b_df.set_index("time")
 
     # If b_error is available, use inverse variance weighting
-    if "b_error" in b_df.columns:
+    if "b_error" in b_df.columns and b_df["b_error"].notna().any():
         # Weight by inverse variance
         b_df["weight"] = 1.0 / (b_df["b_error"] ** 2 + 0.01)  # Add small constant
         
-        # Resample with weighted mean
-        b_resampled = b_df["b_value"].resample(target_freq).apply(
-            lambda x: np.average(x, weights=b_df.loc[x.index, "weight"])
-        )
+        # Resample with weighted mean - handle potential zero weights
+        def safe_weighted_mean(x):
+            weights = b_df.loc[x.index, "weight"]
+            if weights.sum() < 1e-10:
+                return x.mean()  # Fallback to simple mean
+            return np.average(x, weights=weights)
+        
+        b_resampled = b_df["b_value"].resample(target_freq).apply(safe_weighted_mean)
     else:
         b_resampled = b_df["b_value"].resample(target_freq).mean()
     

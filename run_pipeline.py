@@ -69,6 +69,11 @@ def run_ingestion():
         
         print(f"\n✓ Catalogo pulito: {len(df)} eventi")
         print(f"  Periodo: {df['time'].min()} - {df['time'].max()}")
+        
+        # Normalizza nome colonna magnitudo (può essere 'mag' o 'magnitude')
+        if 'mag' in df.columns and 'magnitude' not in df.columns:
+            df = df.rename(columns={'mag': 'magnitude'})
+        
         print(f"  Magnitudo: {df['magnitude'].min():.1f} - {df['magnitude'].max():.1f}")
         
         return df
@@ -140,7 +145,7 @@ def run_multi_signal_fusion(df, b_df):
         from src.analysis.multi_signal_model import (
             compute_seismic_rate_rolling,
             align_bvalue,
-            compute_unrest_index
+            build_unrest_index
         )
         
         # Calcola tasso sismico
@@ -163,9 +168,9 @@ def run_multi_signal_fusion(df, b_df):
             print("⚠️  Dati uplift non disponibili - solo analisi sismica")
             uplift_aligned = None
         
-        # Calcola unrest index
+        # Calcola unrest index usando build_unrest_index
         print("Calcolo indice di unrest composito...")
-        unrest_df = compute_unrest_index(rate_df, b_aligned, uplift_aligned)
+        unrest_df = build_unrest_index(rate_df["seismic_rate"], b_aligned, uplift_aligned)
         
         # Salva risultati
         unrest_file = Path("data/processed/unrest_index.csv")

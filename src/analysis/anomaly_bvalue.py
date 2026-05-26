@@ -53,6 +53,33 @@ def anomaly_score(df, window=50):
 # Pipeline
 # -----------------------------
 
+def detect_anomalies(df, window=50):
+    """
+    Rileva anomalie nel b-value usando Z-score e quantili.
+    
+    Parameters:
+    -----------
+    df : DataFrame
+        DataFrame con colonna 'b_value' e 'time'
+    window : int
+        Window per il rolling Z-score (default: 50)
+    
+    Returns:
+    --------
+    DataFrame
+        DataFrame con colonne aggiuntive: b_zscore, anomaly_z, anomaly_q, anomaly_score
+    """
+    df = df.copy()
+    
+    # Assicura che time sia datetime
+    if not pd.api.types.is_datetime64_any_dtype(df['time']):
+        df["time"] = pd.to_datetime(df["time"])
+    
+    df = anomaly_score(df, window=window)
+    
+    return df
+
+
 def run_anomaly(input_path="data/processed/b_value_rolling.csv"):
 
     df = pd.read_csv(input_path)
