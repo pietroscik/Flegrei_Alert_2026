@@ -1,5 +1,7 @@
 # 🌋 Flegrei Alert 2026 - Campi Flegrei Quantitative Monitoring System
 
+> 🚧 **Stato**: Work in Progress — pipeline di allerta vulcanica (Docker, servizi, checklist operativa).
+
 ## Abstract
 
 Questo sistema presenta un framework integrato di monitoraggio sismico per la caldera dei Campi Flegrei, combinando molteplici approcci analitici:
@@ -41,7 +43,8 @@ L'analisi si concentra sulla regione della caldera flegrea delimitata da:
 
 ## 2. Installazione
 
-### 2.1 Requisiti
+#
+## 2.1 Requisiti
 
 ```bash
 pip install pandas numpy scipy matplotlib seaborn scikit-learn statsmodels requests
@@ -115,7 +118,8 @@ La pipeline esegue automaticamente:
 1. ✓ Verifica disponibilità dati reali
 2. ✓ Ingestion e pulizia catalogo
 3. ✓ Calcolo rolling b-value
-4. ✓ Rilevamento anomalie
+4. ✓ Rilev
+amento anomalie
 5. ✓ Fusione multi-segnale
 6. ✓ Sistema di allerta precoce
 7. ✓ Generazione report
@@ -194,7 +198,8 @@ Due metodi complementari identificano anomalie nel b-value:
 Tre segnali indipendenti sono integrati in un indice di unrest composito:
 
 1. **Tasso sismico**: Conteggio eventi giornaliero/settimanale
-2. **b-value**: Stima rolling dalla Sezione 4.2
+2. **b-value**: Stim
+a rolling dalla Sezione 4.2
 3. **Sollevamento del suolo**: Spostamento verticale da stazione GNSS (es. RITE)
 
 I segnali sono normalizzati con z-score:
@@ -248,7 +253,8 @@ I grafici sono salvati in `reports/fig/`:
 
 1. **Completezza dei dati**: La magnitudo di completezza del catalogo INGV può variare nel tempo
 2. **Dipendenza da dati uplift**: Richiede dati GNSS esterni per analisi multi-segnale completa
-3. **Assunzioni ETAS**: Il modello assume un rateo di fondo stazionario (potrebbe non valere durante unrest)
+3. **Assunzioni ETAS**: Il modello assume un rateo di fondo staziona
+rio (potrebbe non valere durante unrest)
 4. **Calibrazione soglie**: Le soglie di allerta sono basate su percentili empirici, non modelli fisici
 
 ---
